@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: utilant/ci_runner
-          ref: refactor/trying_reusable_workflows
+          ref: 2.x
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Release python package
