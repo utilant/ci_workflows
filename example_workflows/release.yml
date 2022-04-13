@@ -1,0 +1,19 @@
+name: Upload Docker image / python package (on release)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  dockerfile-push:
+    uses: utilant/ci_workflows/.github/workflows/docker_build.yml@0.x
+    with:
+      image: my-docker-image
+      release: true
+    secrets:
+      GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}
+  on-push:
+    uses: utilant/ci_workflows/.github/workflows/pip_release.yml@0.x
+    secrets:
+      GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}
+          

@@ -1,0 +1,15 @@
+name: Upload Docker image (on push)
+
+on:
+  push:
+    paths:
+      - Dockerfile
+
+jobs:
+  dockerfile-push:
+    uses: utilant/ci_workflows/.github/workflows/docker_build.yml@0.x
+    with:
+      image: ci-test-service
+      release: false
+    secrets:
+      GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}

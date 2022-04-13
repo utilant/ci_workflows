@@ -1,0 +1,9 @@
+name: Linting / Testing
+
+on: push
+
+jobs:
+  on-push:
+    uses: utilant/ci_workflows/.github/workflows/linting_testing.yml@0.x
+    secrets:
+      GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}
