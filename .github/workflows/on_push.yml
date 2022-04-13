@@ -1,0 +1,11 @@
+on:
+  release:
+    types: [push]
+
+jobs:
+  echo-secret:
+    runs-on: ubuntu-latest
+    steps:
+      name: Echo
+      run: echo ${{ secrets.GIT_HUB_PAT }}
+    
