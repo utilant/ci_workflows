@@ -1,0 +1,26 @@
+name: Python package release
+
+on: 
+  workflow_call:
+    secrets:
+      GIT_HUB_PAT:
+        required: true
+
+jobs:
+  python_package:
+    container:
+      image: docker://python:3.8-slim-buster
+      options: --user 1001:1001
+    runs-on: self-hosted
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: refactor/trying_reusable_workflows
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Release python package
+        run: ./.github/scripts/release_package.sh

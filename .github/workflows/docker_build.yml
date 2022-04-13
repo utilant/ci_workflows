@@ -1,4 +1,4 @@
-name: Upload Docker image (on push)
+name: Upload Docker image
 
 on: 
   workflow_call:
