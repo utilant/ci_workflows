@@ -45,7 +45,7 @@ jobs:
           path: .github
       - name: Testing
         run: ./.github/scripts/python_testing.sh
-  testing_39:
+  testing_3_9:
     needs: [linting]
     container:
       image: docker://python:3.9-slim-buster
