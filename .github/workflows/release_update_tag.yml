@@ -6,7 +6,7 @@ on:
 
 jobs:
   bump-tag:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
