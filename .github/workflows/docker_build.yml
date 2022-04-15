@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Docker build and push
-        if: ${{ !inputs.version = '' }}
+        if: ${{ inputs.version == '' }}
         run: python3 .github/scripts/docker_push.py ${{ inputs.image }}
       - name: Docker build and push
         if: ${{ inputs.version != '' }}
