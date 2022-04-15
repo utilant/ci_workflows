@@ -1,0 +1,55 @@
+name: Create Release
+
+on: 
+  workflow_call:
+    inputs:
+      release:
+        required: true
+        type: boolean
+    secrets:
+      GIT_HUB_PAT:
+        required: true
+
+
+jobs:
+  get_version:
+    runs-on: self-hosted
+    outputs:
+      version: ${{ steps.version-number.outputs.version }}
+    container:
+      image: docker://python:3.8-slim-buster
+      options: --user 1001:1001
+    name: Get version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: 2.1.0a0
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Get version number
+        if: ${{ inputs.release }}
+        run: python .github/scripts/versioning.py --release
+      - name: Get version number
+        id: version-number
+        run: python .github/scripts/versioning.py $(if [ ${{ inputs.release }} ]; then echo "--release"; fi)
+  create_release:
+    name: Create Release
+    needs: [get_version]
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.configure.outputs.version }}
+          release_name: ${{ needs.configure.outputs.version }}
+          draft: false
+          prerelease: ${{ !inputs.release }}
