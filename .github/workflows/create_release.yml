@@ -31,11 +31,10 @@ jobs:
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Get version number
-        if: ${{ inputs.release }}
-        run: python .github/scripts/versioning.py --release
-      - name: Get version number
         id: version-number
-        run: python .github/scripts/versioning.py $(if [ ${{ inputs.release }} ]; then echo "--release"; fi)
+        run: |
+        pip install packaging
+        python .github/scripts/versioning.py $(if ${{ inputs.release }}; then echo "--release"; fi)
   create_release:
     name: Create Release
     needs: [get_version]
