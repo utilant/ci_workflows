@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Replace package version
-        if: ${{ inputs.version != "" }}
+        if: ${{ inputs.version != '' }}
         run: python3 .github/scripts/update_version.py --version ${{ inputs.version }}
       - name: Release python package
         run: ./.github/scripts/release_package.sh
