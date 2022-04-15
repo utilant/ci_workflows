@@ -33,8 +33,8 @@ jobs:
       - name: Get version number
         id: version-number
         run: |
-        pip install packaging
-        python .github/scripts/versioning.py $(if ${{ inputs.release }}; then echo "--release"; fi)
+          pip install packaging
+          python .github/scripts/versioning.py $(if ${{ inputs.release }}; then echo "--release"; fi)
   create_release:
     name: Create Release
     needs: [get_version]
