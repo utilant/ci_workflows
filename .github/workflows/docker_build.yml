@@ -6,9 +6,9 @@ on:
       image:
         required: true
         type: string
-      release:
-        required: true
-        type: boolean
+      version:
+        required: false
+        type: string
     secrets:
       GIT_HUB_PAT:
         required: true
@@ -23,12 +23,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: utilant/ci_runner
-          ref: 2.x
+          ref: feat/adding_versioning_logic
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Docker build and push
-        if: ${{ !inputs.release }}
+        if: ${{ !inputs.version = "" }}
         run: python3 .github/scripts/docker_push.py ${{ inputs.image }}
       - name: Docker build and push
-        if: ${{ inputs.release }}
-        run: python3 .github/scripts/docker_push.py ${{ inputs.image }} --release
+        if: ${{ inputs.version != "" }}
+        run: |
+          python3 .github/scripts/update_version.py --version ${{ inputs.version }}
+          python3 .github/scripts/docker_push.py ${{ inputs.image }} --release ${{ inputs.version }}

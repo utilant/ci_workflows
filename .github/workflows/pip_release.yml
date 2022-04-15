@@ -2,6 +2,10 @@ name: Python package release
 
 on: 
   workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
     secrets:
       GIT_HUB_PAT:
         required: true
@@ -19,8 +23,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: utilant/ci_runner
-          ref: 2.x
+          ref: feat/adding_versioning_logic
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
+      - name: Replace package version
+        if: ${{ inputs.version != "" }}
+        run: python3 .github/scripts/update_version.py --version ${{ inputs.version }}
       - name: Release python package
         run: ./.github/scripts/release_package.sh
