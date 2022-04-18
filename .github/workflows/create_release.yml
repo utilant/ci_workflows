@@ -9,6 +9,10 @@ on:
     secrets:
       GIT_HUB_PAT:
         required: true
+    outputs:
+      version:
+        description: "The first job output"
+        value: ${{ jobs.get_version.outputs.version }}
 
 
 jobs:
@@ -27,19 +31,22 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: utilant/ci_runner
-          ref: 2.1.0a0
+          ref: feat/adding_versioning_logic
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Get version number
         id: version-number
         run: |
-          pip install packaging
-          python .github/scripts/versioning.py $(if ${{ inputs.release }}; then echo "--release"; fi)
+          pip install packaging requests
+          python .github/scripts/versioning.py --repo ${GITHUB_REPOSITORY#*/} --token ${{ secrets.GITHUB_TOKEN }} --branch ${GITHUB_REF#refs/heads/} $(if ${{ inputs.release }}; then echo "--release"; fi)
   create_release:
     name: Create Release
     needs: [get_version]
     runs-on: self-hosted
     steps:
+      - name: Get branch name
+        id: branch-name
+        run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Create Release
@@ -48,7 +55,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.configure.outputs.version }}
-          release_name: ${{ needs.configure.outputs.version }}
+          tag_name: ${{ needs.get_version.outputs.version }}
+          release_name: ${{ needs.get_version.outputs.version }}
           draft: false
           prerelease: ${{ !inputs.release }}
+          commitish: ${{ steps.branch-name.outputs.branch }}
