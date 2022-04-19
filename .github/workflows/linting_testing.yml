@@ -1,0 +1,66 @@
+name: Linting / Testing
+
+on: 
+  workflow_call:
+    secrets:
+      GIT_HUB_PAT:
+        required: true
+
+
+jobs:
+  linting:
+    runs-on: self-hosted
+    container:
+      image: docker://python:3.8-slim-buster
+      options: --user 1001:1001
+    name: Linting
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: 2.x
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Linting
+        run: ./.github/scripts/linting.sh
+  testing_3_8:
+    needs: [linting]
+    container:
+      image: docker://python:3.8-slim-buster
+      options: --user 1001:1001
+    runs-on: self-hosted
+    name: Testing (3.8)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: 2.x
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Testing
+        run: ./.github/scripts/python_testing.sh
+  testing_3_9:
+    needs: [linting]
+    container:
+      image: docker://python:3.9-slim-buster
+      options: --user 1001:1001
+    runs-on: self-hosted
+    name: Testing (3.9)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: 2.x
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Testing
+        run: ./.github/scripts/python_testing.sh

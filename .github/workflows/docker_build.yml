@@ -1,0 +1,34 @@
+name: Upload Docker image
+
+on: 
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      release:
+        required: true
+        type: boolean
+    secrets:
+      GIT_HUB_PAT:
+        required: true
+
+jobs:
+  build_and_push:
+    runs-on: self-hosted
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: 2.x
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Docker build and push
+        if: ${{ !inputs.release }}
+        run: python3 .github/scripts/docker_push.py ${{ inputs.image }}
+      - name: Docker build and push
+        if: ${{ inputs.release }}
+        run: python3 .github/scripts/docker_push.py ${{ inputs.image }} --release

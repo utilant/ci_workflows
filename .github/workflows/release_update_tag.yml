@@ -1,0 +1,19 @@
+name: Update tag on release
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  bump-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Release python package
+        run: |
+          export VERSION=$(git describe --exact-match --tags $(git log -n1 --pretty='%h') | sed 's/[^a-zA-Z0-9\.]/-/g')
+          export MAJOR=${VERSION%.*.*}.x
+          git push origin :refs/tags/$MAJOR
+          git tag -f $MAJOR
+          git push origin --tags
