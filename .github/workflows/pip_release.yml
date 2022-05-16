@@ -2,6 +2,10 @@ name: Python package release
 
 on: 
   workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
     secrets:
       GIT_HUB_PAT:
         required: true
@@ -22,5 +26,8 @@ jobs:
           ref: 2.x
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
+      - name: Replace package version
+        if: ${{ inputs.version != '' }}
+        run: python3 .github/scripts/update_version.py --version ${{ inputs.version }}
       - name: Release python package
         run: ./.github/scripts/release_package.sh

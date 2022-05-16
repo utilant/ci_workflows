@@ -1,0 +1,62 @@
+name: Create Release
+
+on: 
+  workflow_call:
+    inputs:
+      release:
+        required: true
+        type: boolean
+    secrets:
+      GIT_HUB_PAT:
+        required: true
+    outputs:
+      version:
+        description: "The first job output"
+        value: ${{ jobs.get_version.outputs.version }}
+
+
+jobs:
+  get_version:
+    runs-on: self-hosted
+    outputs:
+      version: ${{ steps.version-number.outputs.version }}
+    container:
+      image: docker://python:3.8-slim-buster
+      options: --user 1001:1001
+    name: Get version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: utilant/ci_runner
+          ref: feat/adding_versioning_logic
+          token: ${{ secrets.GIT_HUB_PAT }}
+          path: .github
+      - name: Get version number
+        id: version-number
+        run: |
+          pip install packaging requests
+          python .github/scripts/versioning.py --repo ${GITHUB_REPOSITORY#*/} --token ${{ secrets.GITHUB_TOKEN }} --branch ${GITHUB_REF#refs/heads/} $(if ${{ inputs.release }}; then echo "--release"; fi)
+  create_release:
+    name: Create Release
+    needs: [get_version]
+    runs-on: self-hosted
+    steps:
+      - name: Get branch name
+        id: branch-name
+        run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.get_version.outputs.version }}
+          release_name: ${{ needs.get_version.outputs.version }}
+          draft: false
+          prerelease: ${{ !inputs.release }}
+          commitish: ${{ steps.branch-name.outputs.branch }}
