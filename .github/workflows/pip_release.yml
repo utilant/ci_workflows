@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: utilant/ci_runner
-          ref: feat/adding_versioning_logic
+          ref: 2.x
           token: ${{ secrets.GIT_HUB_PAT }}
           path: .github
       - name: Replace package version
