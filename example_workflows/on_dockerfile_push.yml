@@ -10,6 +10,5 @@ jobs:
     uses: utilant/ci_workflows/.github/workflows/docker_build.yml@0.x
     with:
       image: my-docker-image
-      release: false
     secrets:
       GIT_HUB_PAT: ${{ secrets.GIT_HUB_PAT }}
